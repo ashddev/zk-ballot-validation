@@ -11,42 +11,44 @@ extern crate bulletproofs;
 use bulletproofs::{BulletproofGens, PedersenGens, RangeProof};
 
 fn main() {
-    // Generators for Pedersen commitments. These can be selected
-    // independently of the Bulletproofs generators.
     let pc_gens = PedersenGens::default();
+    let bp_gens = BulletproofGens::new(8, 4);
 
-    // Generators for Bulletproofs, valid for proofs up to bitsize 64
-    // and aggregation size up to 1.
-    let bp_gens = BulletproofGens::new(64, 1);
+    let votes: Vec<i32> = vec![0, 199, 55];
 
-    // A secret value we want to prove lies in the range [0, 2^32)
-    let secret_value = 1037578891u64;
-
-    // The API takes a blinding factor for the commitment.
+    let votes_u64: Vec<u64> = votes.iter().map(|&v| v as u64).collect();
+    let sum: u64 = votes_u64.iter().sum();
+    
     let mut rng = thread_rng();
-    let blinding = Scalar::random(&mut rng);
+    let blindings: Vec<Scalar> = (0..votes.len() + 1).map(|_| Scalar::random(&mut rng)).collect();
 
-    // The proof can be chained to an existing transcript.
-    // Here we create a transcript with a doctest domain separator.
-    let mut prover_transcript = Transcript::new(b"doctest example");
+    let mut prover_transcript = Transcript::new(b"multi-vote test");
 
-    // Create a 32-bit rangeproof.
-    let (proof, committed_value) = RangeProof::prove_single(
+    let all_values = votes_u64.iter().chain(std::iter::once(&sum)).cloned().collect::<Vec<u64>>();
+    let all_blindings = blindings.clone();
+
+    let (proof, committed_values) = RangeProof::prove_multiple(
         &bp_gens,
         &pc_gens,
         &mut prover_transcript,
-        secret_value,
-        &blinding,
-        32,
+        &all_values,
+        &all_blindings,
+        8, // 8 bits for each value
     )
-    .unwrap();
+    .expect("Failed to create aggregated rangeproof");
 
-    // Verification requires a transcript with identical initial state:
-    let mut verifier_transcript = Transcript::new(b"doctest example");
-    assert!(
-        proof
-            .verify_single(&bp_gens, &pc_gens, &mut verifier_transcript, &committed_value, 32)
-            .is_ok()
-    );
+    println!("Aggregated rangeproof created successfully!");
+    println!("Committed values: {:?}", committed_values);
+
+    let mut verifier_transcript = Transcript::new(b"multi-vote test");
+    
+    if proof
+        .verify_multiple(&bp_gens, &pc_gens, &mut verifier_transcript, &committed_values, 8)
+        .is_ok()
+    {
+        println!("Aggregated rangeproof verified successfully!");
+    } else {
+        println!("Aggregated rangeproof verification failed");
+    }
 
 }
