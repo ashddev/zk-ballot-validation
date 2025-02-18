@@ -1,0 +1,139 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{Mathematical Foundations of Bulletproofs in Rated Voting Systems}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document explains the mathematical foundations behind the zero-knowledge proof protocol implemented using Bulletproofs and Pedersen commitments in a rated voting system. The focus is on how homomorphic properties of Pedersen commitments enable verification of ballots without revealing individual votes.
+
+\section{System Overview}
+Consider a simple voting system with 3 candidates. Each voter can allocate up to a maximum of \( \text{max\_credits} = 20 \) credits across the candidates. Let the allocated credits be \( A, B, C \) such that:
+
+\[
+A + B + C \leq 20
+\]
+
+The goal is to:
+\begin{itemize}
+    \item Commit to each candidate's vote securely.
+    \item Prove the sum of votes does not exceed \( \text{max\_credits} \).
+    \item Ensure the proof is zero-knowledge, i.e., no vote information is leaked.
+\end{itemize}
+
+\section{Pedersen Commitments}
+A Pedersen commitment to a value \( v \) with blinding factor \( r \) is defined as:
+
+\[
+\text{Com}(v, r) = g^v h^r
+\]
+
+where \( g \) and \( h \) are generators of a prime-order group, and \( r \) is a random scalar ensuring hiding properties.
+
+\subsection{Homomorphic Properties}
+Pedersen commitments are additively homomorphic:
+
+\[
+\text{Com}(v_1, r_1) \cdot \text{Com}(v_2, r_2) = g^{v_1 + v_2} h^{r_1 + r_2}
+\]
+
+This allows commitments to be aggregated without revealing the underlying values.
+
+\section{Ballot Commitment and Proof Generation}
+For three candidates, the voter allocates \( A, B, C \) credits. The commitments are:
+
+\[
+\text{Com}(A, r_A), \quad \text{Com}(B, r_B), \quad \text{Com}(C, r_C)
+\]
+
+The commitment to the total votes \( Z = A + B + C \) is:
+
+\[
+\text{Com}(Z, r_Z) = \text{Com}(A, r_A) \cdot \text{Com}(B, r_B) \cdot \text{Com}(C, r_C)
+\]
+
+where:
+
+\[
+Z = A + B + C, \quad r_Z = r_A + r_B + r_C
+\]
+
+\subsection{Proof of Budget Compliance}
+To prove \( Z \leq \text{max\_credits} \), we define:
+
+\[
+D = \text{max\_credits} - Z
+\]
+
+Commit to \( D \) as:
+
+\[
+\text{Com}(D, r_D) = g^D h^{r_D}
+\]
+
+Using homomorphic properties:
+
+\[
+\text{Com}(D, r_D) = \text{Com}(\text{max\_credits}, 0) \cdot \text{Com}(Z, r_Z)^{-1}
+\]
+
+Since:
+
+\[
+\text{Com}(\text{max\_credits}, 0) = g^{\text{max\_credits}}
+\]
+
+We enforce consistency with:
+
+\[
+\text{Com}(D, r_D) = g^{\text{max\_credits} - Z} h^{-r_Z}
+\]
+
+Hence, \( r_D = -r_Z \) to maintain equality.
+
+\subsection{Range Proof}
+A Bulletproof range proof is generated to show:
+
+\[
+D \in [0, 255]
+\]
+
+This ensures \( Z \leq \text{max\_credits} \) without revealing \( Z \) or \( D \).
+
+\section{Verification Process}
+To verify a ballot:
+
+\begin{enumerate}
+    \item Check that the sum of commitments equals the commitment to the total:
+    \[
+    \text{Com}(A) + \text{Com}(B) + \text{Com}(C) = \text{Com}(Z)
+    \]
+    \item Verify commitment consistency:
+    \[
+    \text{Com}(D) = \text{Com}(\text{max\_credits}) - \text{Com}(Z)
+    \]
+    \item Validate the Bulletproof range proof for \( D \).
+\end{enumerate}
+
+\section{Example}
+Let \( A = 7, B = 8, C = 4 \), and \( \text{max\_credits} = 20 \).
+
+\begin{align*}
+Z &= A + B + C = 19 \\
+D &= 20 - 19 = 1
+\end{align*}
+
+The commitments and range proof are generated accordingly, and verification ensures the correctness without revealing \( A, B, C \).
+
+\section{Conclusion}
+This protocol leverages the homomorphic properties of Pedersen commitments and Bulletproof range proofs to securely verify ballots in rated voting systems, ensuring both correctness and privacy.
+
+\end{document}
+

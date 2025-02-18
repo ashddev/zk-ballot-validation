@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+\title{No-Budget Rated Voting System Using Homomorphic Commitments and Bulletproofs}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+This document details the mathematical framework and verification process of a no-budget rated voting system using homomorphic commitments and Bulletproof range proofs. The protocol ensures that votes are within a defined range while maintaining voter privacy.
+
+\section{System Overview}
+In the no-budget rated voting system, each voter assigns a score to a candidate within a predefined range, such as \([-10, 10]\). The goal is to:
+\begin{itemize}
+    \item Securely commit to each vote.
+    \item Prove that each vote lies within the allowed range.
+    \item Ensure zero-knowledge, meaning no vote information is leaked during verification.
+\end{itemize}
+
+\section{Pedersen Commitments}
+A Pedersen commitment to a value \( v \) with a blinding factor \( r \) is defined as:
+
+\[
+\text{Com}(v, r) = g^v h^r
+\]
+
+where \( g \) and \( h \) are generators of a prime-order group, and \( r \) is a random scalar that ensures the hiding property.
+
+\subsection{Homomorphic Properties}
+Pedersen commitments are additively homomorphic:
+
+\[
+\text{Com}(v_1, r_1) \cdot \text{Com}(v_2, r_2) = g^{v_1 + v_2} h^{r_1 + r_2}
+\]
+
+This property enables operations on committed values without revealing the underlying data.
+
+\section{Vote Commitment and Proof Generation}
+Votes are shifted from the original range \( [a, b] \) to \( [0, n] \) to simplify proof generation. The shifted vote \( v' \) is:
+
+\[
+ v' = v + \frac{n}{2}
+\]
+
+where \( n = |b - a| \) is the choice space cardinality.
+
+For each vote \( v \):
+\begin{align*}
+    \text{Com}(v, r) &= g^v h^r \\
+    D &= n - v' \\
+    \text{Com}(D, r_D) &= \text{Com}(n, 0) - \text{Com}(v, r)
+\end{align*}
+
+The blinding factor \( r_D \) satisfies:
+
+\[
+ r_D = -r
+\]
+
+\subsection{Range Proof}
+A Bulletproof range proof is generated to prove:
+
+\[
+D \in [0, n]
+\]
+
+This ensures that the original vote \( v \) is within the allowed range.
+
+\section{Verification Process}
+To verify a ballot:
+\begin{enumerate}
+    \item Verify the aggregated range proof for all \( D \) values.
+    \item Check the consistency of commitments:
+    \[
+    \text{Com}(D) = \text{Com}(n) - \text{Com}(v)
+    \]
+\end{enumerate}
+
+\section{Example}
+Consider a voting range of \([-10, 10]\), where \( n = 20 \). A vote of \( v = 5 \) is shifted to:
+
+\[
+ v' = 5 + 10 = 15
+\]
+
+Then:
+
+\begin{align*}
+    D &= 20 - 15 = 5 \\
+    \text{Com}(v) &= g^5 h^r \\
+    \text{Com}(D) &= g^5 h^{-r}
+\end{align*}
+
+A Bulletproof range proof verifies that \( D \in [0, 20] \), ensuring the vote is within the valid range without revealing its value.
+
+\section{Conclusion}
+This no-budget rated voting system leverages homomorphic properties of Pedersen commitments and Bulletproof range proofs to ensure both the validity and privacy of votes. The protocol is efficient, scalable, and secure for practical voting applications.
+
+\end{document}
+
