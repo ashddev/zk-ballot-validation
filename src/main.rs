@@ -2,10 +2,7 @@
 // mod utils;
 mod ranked_voting;
 
-use ark_bls12_381::{Fr, G1Affine, G1Projective};
-use ark_ec::ProjectiveCurve;
 // use bulletproofs::{BulletproofGens, PedersenGens};
-use curdleproofs::curdleproofs::{CurdleproofsCrs, generate_crs};
 
 fn main() {
     // let pc_gens = PedersenGens::default();
