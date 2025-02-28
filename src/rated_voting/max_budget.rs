@@ -58,13 +58,11 @@ pub fn verify_proof(
 ) -> bool {
     let aggregated_commitment: RistrettoPoint = ballot_commitments.iter().fold(RistrettoPoint::default(), |acc: RistrettoPoint, &commit| acc + commit );
     if aggregated_commitment != com_z {
-        println!("Commitment aggregation failed!");
         return false;
     }
 
     let com_max_credits: RistrettoPoint = pc_gens.commit(Scalar::from(max_credits), Scalar::zero());
     if rangeproof_d.1 != (com_max_credits - com_z).compress() {
-        println!("Commitment consistency for D failed!");
         return false;
     }
 
@@ -73,10 +71,8 @@ pub fn verify_proof(
         .verify_single(&bp_gens, &pc_gens, &mut verifier_transcript, &rangeproof_d.1, 8)
         .is_err()
     {
-        println!("Range proof verification failed!");
         return false;
     }
 
-    println!("Ballot verification successful!");
     true
 }

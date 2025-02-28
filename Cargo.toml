@@ -1,7 +1,15 @@
 [package]
-name = "bulletproof"
+name = "zk_ballot_verification"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+name = "zk_ballot_verification"
+path = "src/lib.rs"
+
+[[bin]]
+name = "zk_ballot_verification_main"
+path = "src/main.rs"
 
 [dependencies]
 rand = "0.8"
@@ -13,3 +21,18 @@ ark-bls12-381 = "0.3"
 ark-ff = "0.3"
 ark-std = "0.4"
 curdleproofs = "0.0.1"
+
+[dev-dependencies]
+criterion = "0.5.1"
+
+[[bench]]
+name = "ranked_voting"
+harness = false
+
+[[bench]]
+name = "no_budget_rated_voting"
+harness = false
+
+[[bench]]
+name = "max_budget_rated_voting"
+harness = false

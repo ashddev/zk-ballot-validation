@@ -1,0 +1,86 @@
+Generate Max-Budget Proof/4
+                        time:   [2.6455 ms 2.6664 ms 2.7105 ms]
+                        change: [-8.4158% -4.8328% -1.4761%] (p = 0.03 < 0.05)
+                        Change within noise threshold.
+Generate Max-Budget Proof/8
+                        time:   [2.9111 ms 2.9176 ms 2.9251 ms]
+                        change: [-31.436% -24.556% -16.910%] (p = 0.00 < 0.05)
+                        Performance has improved.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Generate Max-Budget Proof/16
+                        time:   [3.5078 ms 3.5159 ms 3.5256 ms]
+                        change: [-5.9584% -3.3473% -1.3322%] (p = 0.01 < 0.05)
+                        Change within noise threshold.
+Found 2 outliers among 10 measurements (20.00%)
+  1 (10.00%) high mild
+  1 (10.00%) high severe
+Generate Max-Budget Proof/32
+                        time:   [4.8019 ms 4.8134 ms 4.8275 ms]
+                        change: [+0.8917% +1.5118% +2.2037%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Generate Max-Budget Proof/64
+                        time:   [7.1750 ms 7.1824 ms 7.1939 ms]
+                        change: [-0.5403% +0.0895% +0.6672%] (p = 0.75 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Generate Max-Budget Proof/128
+                        time:   [12.016 ms 12.027 ms 12.034 ms]
+                        change: [-2.0463% -1.3868% -0.7320%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Generate Max-Budget Proof/256
+                        time:   [22.004 ms 22.253 ms 22.574 ms]
+                        change: [-0.0391% +1.2985% +2.5260%] (p = 0.03 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high mild
+
+Verify Max-Budget Proof/4
+                        time:   [518.22 µs 518.94 µs 519.47 µs]
+                        change: [-3.8079% -1.0339% +0.6585%] (p = 0.84 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Verify Max-Budget Proof/8
+                        time:   [518.36 µs 525.06 µs 535.55 µs]
+                        change: [-1.7070% -0.6742% +0.8884%] (p = 0.43 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Verify Max-Budget Proof/16
+                        time:   [525.56 µs 526.89 µs 528.61 µs]
+                        change: [+1.6173% +2.1906% +2.8246%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 2 outliers among 10 measurements (20.00%)
+  1 (10.00%) low severe
+  1 (10.00%) high severe
+Verify Max-Budget Proof/32
+                        time:   [520.64 µs 521.36 µs 522.14 µs]
+                        change: [-3.6584% -1.9028% -0.3424%] (p = 0.10 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Verify Max-Budget Proof/64
+                        time:   [524.39 µs 525.42 µs 526.50 µs]
+                        change: [-6.1425% -4.7248% -3.3669%] (p = 0.00 < 0.05)
+                        Change within noise threshold.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Verify Max-Budget Proof/128
+                        time:   [548.41 µs 553.41 µs 563.14 µs]
+                        change: [+0.2802% +3.7824% +8.2075%] (p = 0.05 > 0.05)
+                        No change in performance detected.
+Found 1 outliers among 10 measurements (10.00%)
+  1 (10.00%) high severe
+Verify Max-Budget Proof/256
+                        time:   [571.73 µs 575.25 µs 580.07 µs]
+                        change: [-1.7753% +0.3591% +1.7526%] (p = 0.71 > 0.05)
+                        No change in performance detected.
+Found 2 outliers among 10 measurements (20.00%)
+  2 (20.00%) high severe
+

@@ -67,19 +67,16 @@ pub fn verify_proof(
         )
         .is_err()
     {
-        println!("Range proof verification failed!");
         return false;
     }
 
     for (d_commitment, v_commitment) in d_commitments.iter().zip(v_commitments.iter()) {
         let com_max = pc_gens.commit(Scalar::from(choice_space_cardinality), Scalar::zero());
         if *d_commitment != (com_max - v_commitment.decompress().unwrap()).compress() {
-            println!("Commitment consistency failed!");
             return false;
         }
     }
 
-    println!("Proof verification successful!");
     true
 }
 
