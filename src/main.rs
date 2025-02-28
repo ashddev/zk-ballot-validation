@@ -1,7 +1,7 @@
 use bulletproofs::{BulletproofGens, PedersenGens};
-use zk_ballot_verification::rated_voting;
-// use zk_ballot_verification::utils::ranked::find_permutation;
-// use zk_ballot_verification::ranked_voting::shuffle_proof::{generate_crs, generate_shuffle_proof, verify_shuffle_proof};
+use zk_ballot_validation::rated_voting;
+// use zk_ballot_validation::utils::ranked::find_permutation;
+// use zk_ballot_validation::ranked_voting::shuffle_proof::{generate_crs, generate_shuffle_proof, verify_shuffle_proof};
 
 fn main() {
     let pc_gens = PedersenGens::default();

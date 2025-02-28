@@ -1,14 +1,14 @@
 [package]
-name = "zk_ballot_verification"
+name = "zk_ballot_validation"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "zk_ballot_verification"
+name = "zk_ballot_validation"
 path = "src/lib.rs"
 
 [[bin]]
-name = "zk_ballot_verification_main"
+name = "zk_ballot_validation_main"
 path = "src/main.rs"
 
 [dependencies]

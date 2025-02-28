@@ -1280,7 +1280,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "zk_ballot_verification"
+name = "zk_ballot_validation"
 version = "0.1.0"
 dependencies = [
  "ark-bls12-381",

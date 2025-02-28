@@ -1,5 +1,5 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use zk_ballot_verification::rated_voting::no_budget::{generate_proof, verify_proof};
+use zk_ballot_validation::rated_voting::no_budget::{generate_proof, verify_proof};
 use bulletproofs::{BulletproofGens, PedersenGens};
 
 fn benchmark_generate_no_budget_proof(c: &mut Criterion) {

@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use zk_ballot_verification::ranked_voting::shuffle_proof::{generate_crs, generate_shuffle_proof, verify_shuffle_proof};
-use zk_ballot_verification::utils::ranked::find_permutation;
+use zk_ballot_validation::ranked_voting::shuffle_proof::{generate_crs, generate_shuffle_proof, verify_shuffle_proof};
+use zk_ballot_validation::utils::ranked::find_permutation;
 
 fn benchmark_generate_shuffle_proof(c: &mut Criterion) {
     let mut group = c.benchmark_group("Generate Shuffle Proof");
