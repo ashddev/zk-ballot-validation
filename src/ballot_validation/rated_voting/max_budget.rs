@@ -145,3 +145,65 @@ pub fn verify_proof(
 
     true
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn basic_setup(ballot_size: usize, max_credit: u64) -> SetupParameters {
+        setup(max_credit, ballot_size, None)
+    }
+
+    #[test]
+    fn test_valid_proof() {
+        let setup_params = basic_setup(4, 20);
+        let ballot = vec![5, 3, 6, 6]; // sums to 20
+
+        let proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
+        assert!(verify_proof(&setup_params, proof), "Valid proof should verify");
+    }
+
+    #[test]
+    fn test_overspending_fails() {
+        let setup_params = basic_setup(3, 15);
+        let ballot = vec![10, 5, 3]; // sum = 18 > max
+
+        let result = generate_proof(&setup_params, ballot);
+        assert!(result.is_err(), "Should fail to generate proof for overspending ballot");
+    }
+
+    #[test]
+    fn test_wrong_commitment_fails() {
+        let setup_params = basic_setup(2, 10);
+        let ballot = vec![5, 5];
+
+        let mut proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
+
+        // Tamper with one vote commitment
+        proof.votes_proof.1[0] = setup_params.pc_gens.commit(Scalar::from(999u64), Scalar::zero()).compress();
+
+        assert!(!verify_proof(&setup_params, proof), "Tampered commitment should not verify");
+    }
+
+    #[test]
+    fn test_mismatched_ballot_length() {
+        let setup_params = basic_setup(4, 10);
+        let ballot = vec![3, 4]; // fewer than ballot_size
+
+        let result = generate_proof(&setup_params, ballot);
+        assert!(result.is_err(), "Should fail when ballot length doesn't match setup");
+    }
+
+    #[test]
+    fn test_commitment_equality_check() {
+        let setup_params = basic_setup(2, 8);
+        let ballot = vec![4, 4];
+
+        let proof = generate_proof(&setup_params, ballot).unwrap();
+        let expected_sum_commitment = proof.votes_proof.1.iter()
+            .map(|c| c.decompress().unwrap())
+            .fold(RistrettoPoint::default(), |acc, c| acc + c);
+
+        assert_eq!(expected_sum_commitment, proof.com_z, "Aggregated commitment should match com_z");
+    }
+}

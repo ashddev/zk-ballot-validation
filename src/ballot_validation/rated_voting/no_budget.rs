@@ -112,3 +112,56 @@ fn shift_vote(value: i64, range_upperbound: i64) -> Result<u64, String> {
         .try_into()
         .map_err(|_| format!("Shifted value out of u64 range: {}", value + range_upperbound))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use curve25519_dalek_ng::scalar::Scalar;
+
+    fn basic_setup(ballot_size: usize) -> SetupParameters {
+        let range = (-10, 10);
+        setup(range, ballot_size, None).unwrap()
+    }
+
+    #[test]
+    fn test_valid_proof_verification() {
+        let setup_params = basic_setup(4);
+        let ballot = vec![0, -5, 7, 10];
+
+        let proof = generate_proof(ballot, &setup_params).expect("Proof generation failed");
+        assert!(verify_proof(&setup_params, proof), "Proof verification failed for valid input");
+    }
+
+    #[test]
+    fn test_invalid_proof_verification_wrong_commitments() {
+        let setup_params = basic_setup(2);
+        let ballot = vec![3, -2];
+        let mut proof = generate_proof(ballot, &setup_params).expect("Proof generation failed");
+
+        // Tamper with one of the commitments
+        proof.shifted_ballot_committments[0] = setup_params.pc_gens.commit(Scalar::from(999u64), Scalar::random(&mut thread_rng())).compress();
+
+        assert!(!verify_proof(&setup_params, proof), "Tampered proof should not verify");
+    }
+
+    #[test]
+    fn test_invalid_proof_verification_out_of_range() {
+        let setup_params = basic_setup(2);
+        let ballot = vec![15, -12]; // Out of range since range is -10 to 10
+
+        let result = generate_proof(ballot, &setup_params);
+        assert!(result.is_err(), "Should not generate proof for out-of-range vote");
+    }
+
+    #[test]
+    fn test_non_power_of_two_ballot_size() {
+        let result = setup((-10, 10), 3, None);
+        assert!(result.is_err(), "Ballot size not power of two should fail");
+    }
+
+    #[test]
+    fn test_asymmetric_range_should_fail() {
+        let result = setup((-10, 8), 2, None);
+        assert!(result.is_err(), "Asymmetric range should be rejected");
+    }
+}

@@ -130,25 +130,87 @@ fn find_permutation(vec_a: &[u32], vec_b: &[u32]) -> Result<Vec<u32>, String> {
         return Err("Vectors must be the same length".to_string());
     }
 
-    let index_map: HashMap<u32, usize> = vec_a
-        .iter()
-        .enumerate()
-        .map(|(i, &x)| (x, i))
-        .collect();
-
-    let p: Vec<usize> = vec_b
-        .iter()
-        .map(|&x| {
-            index_map
-                .get(&x)
-                .copied()
-                .ok_or_else(|| format!("Element {} not found in original vector", x))
-        })
-        .collect::<Result<Vec<usize>, String>>()?;
-    
-    let mut inv = vec![0; p.len()];
-    for (i, &pi) in p.iter().enumerate() {
-        inv[pi] = i as u32;
+    let mut index_map: HashMap<u32, usize> = HashMap::new();
+    for (i, &val) in vec_a.iter().enumerate() {
+        if index_map.insert(val, i).is_some() {
+            return Err(format!("Duplicate value {} in vec_a not allowed", val));
+        }
     }
-    Ok(inv)
+
+    let permutation: Vec<u32> = vec_b
+        .iter()
+        .map(|&val| {
+            index_map
+                .get(&val)
+                .map(|&i| i as u32)
+                .ok_or_else(|| format!("Value {} in vec_b not found in vec_a", val))
+        })
+        .collect::<Result<_, _>>()?;
+
+    Ok(permutation)
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_valid_permutation_proof() {
+        let a_vec = vec![3, 1, 4, 2];
+        let ballot = vec![1, 4, 2, 3];
+        let setup_params = setup(a_vec.len(), a_vec.clone());
+
+        let proof = generate_proof(&ballot, &setup_params).expect("Should generate proof");
+        assert!(verify_proof(&proof, &setup_params), "Proof should verify for valid permutation");
+    }
+
+    #[test]
+    fn test_invalid_permutation_proof() {
+        let a_vec = vec![3, 1, 4, 2];
+        let ballot = vec![1, 4, 2, 9];
+        let setup_params = setup(a_vec.len(), a_vec.clone());
+
+        let result = generate_proof(&ballot, &setup_params);
+        assert!(result.is_err(), "Should fail to generate proof for invalid permutation");
+    }
+
+    #[test]
+    fn test_mismatched_vector_length() {
+        let a_vec = vec![1, 2, 3];
+        let ballot = vec![2, 3];
+        let setup_params = setup(a_vec.len(), a_vec.clone());
+
+        let result = generate_proof(&ballot, &setup_params);
+        assert!(result.is_err(), "Should fail due to mismatched lengths");
+    }
+
+    #[test]
+    fn test_proof_integrity_fails_on_tamper() {
+        let a_vec = vec![5, 10, 15, 20];
+        let ballot = vec![10, 5, 20, 15];
+        let setup_params = setup(a_vec.len(), a_vec.clone());
+
+        let mut proof = generate_proof(&ballot, &setup_params).expect("Proof should be valid");
+
+        proof.committed_permutation = G1Projective::rand(&mut StdRng::seed_from_u64(999));
+
+        assert!(!verify_proof(&proof, &setup_params), "Tampered proof should not verify");
+    }
+
+    #[test]
+    fn test_find_permutation_correctness() {
+        let a_vec = vec![7, 8, 9, 10];
+        let b_vec = vec![8, 10, 9, 7];
+    
+        let permutation = find_permutation(&a_vec, &b_vec).expect("Should return a valid forward permutation");
+    
+        assert_eq!(permutation.len(), a_vec.len());
+    
+        for i in 0..a_vec.len() {
+            let sigma_i = permutation[i] as usize;
+            assert_eq!(a_vec[sigma_i], b_vec[i], "Mismatch at i={}", i);
+        }
+    }
 }
