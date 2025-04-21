@@ -23,16 +23,12 @@ ark-std = "0.4"
 curdleproofs = "0.0.1"
 
 [dev-dependencies]
-criterion = "0.5.1"
+criterion = { version = "0.5.1", features = ["html_reports"] }
 
 [[bench]]
-name = "ranked_voting"
+name = "proof_generation"
 harness = false
 
 [[bench]]
-name = "no_budget_rated_voting"
-harness = false
-
-[[bench]]
-name = "max_budget_rated_voting"
+name = "proof_verification"
 harness = false

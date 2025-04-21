@@ -1,40 +1,39 @@
-use bulletproofs::{BulletproofGens, PedersenGens};
-use zk_ballot_validation::rated_voting;
-// use zk_ballot_validation::utils::ranked::find_permutation;
-// use zk_ballot_validation::ranked_voting::shuffle_proof::{generate_crs, generate_shuffle_proof, verify_shuffle_proof};
+use zk_ballot_validation::ballot_validation::{ranked_voting, rated_voting};
 
 fn main() {
-    let pc_gens = PedersenGens::default();
-    let bp_gens = BulletproofGens::new(8, 4);
-
-    let ballot: Vec<u64> = vec![0,0,1,0];
-    let max_credits = 1;
-
-    let (commitments, com_z, rangeproof_d) = rated_voting::max_budget::generate_proof(ballot, max_credits, &pc_gens, &bp_gens);
-    let result = rated_voting::max_budget::verify_proof(&pc_gens, &bp_gens, commitments, com_z, rangeproof_d, max_credits);
-    println!("{}", result);
-
-    // let ballot: Vec<i64> = vec![-10, 10, 5, 2];
-    // let range = (-10, 10);
-
-    // let  (v_commitments, rangeproof) = rated_voting::no_budget::generate_proof(ballot,range, &pc_gens, &bp_gens);
-    // let result = rated_voting::no_budget::verify_proof(&pc_gens, &bp_gens, v_commitments, rangeproof, range);
-    // println!("{}", result);
-
-    // let vec_a_u32 = vec![1];
-    // let vec_a_permuted = vec![1];
-
-    // if let Some(permutation) = find_permutation(&vec_a_u32, &vec_a_permuted) {
-    //     let crs = generate_crs(vec_a_u32.len(), 4);
-    //     let proof = generate_shuffle_proof(vec_a_u32.clone(), vec_a_permuted.clone(), permutation, &crs);
-
-    //     if verify_shuffle_proof(&proof, &crs, vec_a_u32, 4) {
-    //         println!("Verification successful!");
-    //     } else {
-    //         println!("Verification failed!");
-    //     }
-    // } else {
-    //     println!("Error: Invalid permutation.");
-    // }
+    run_max_budget_rated_voting().unwrap();
+    run_no_budget_rated_voting().unwrap();
+    run_ranked_voting().unwrap();
 }
 
+fn run_no_budget_rated_voting() -> Result<(), String> {
+    let setup_params = rated_voting::no_budget::setup((-10, 10), 4, None)?;
+    let ballot: Vec<i64> = vec![-10, 10, 5, -18];
+    let validity_proof = rated_voting::no_budget::generate_proof(ballot, &setup_params)?;
+
+    let result = rated_voting::no_budget::verify_proof(&setup_params, validity_proof);
+    println!("{}", result);
+    Ok(())
+}
+
+fn run_max_budget_rated_voting() -> Result<(), String> {
+    let setup_params = rated_voting::max_budget::setup(1, 4, None);
+    let ballot: Vec<u64> = vec![0,0,2,0];
+
+    let validity_proof = rated_voting::max_budget::generate_proof(&setup_params, ballot);
+    let result: bool = rated_voting::max_budget::verify_proof(&setup_params, validity_proof);
+    println!("{}", result);
+    Ok(())
+}
+
+fn run_ranked_voting() -> Result<(), String> {
+    let vec_a: Vec<u32> = vec![1,2,3,4];
+    let vec_a_permuted: Vec<u32> = vec![1,4,3,2];
+
+    let setup_params = ranked_voting::setup(vec_a.len(), vec_a);
+    let proof = ranked_voting::generate_proof( &vec_a_permuted, &setup_params);
+    let result: bool = ranked_voting::verify_proof(&proof, &setup_params);
+
+    println!("{}", result);
+    Ok(())
+}

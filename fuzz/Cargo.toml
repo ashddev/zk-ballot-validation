@@ -1,0 +1,25 @@
+[package]
+name = "zk_ballot_validation-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1.3", features = ["derive"] }
+curve25519-dalek = "4.1.1"
+merlin = "3.0"
+rand = "0.8"
+
+[dependencies.zk_ballot_validation]
+path = ".."
+
+[[bin]]
+name = "generate_proof"
+path = "fuzz_targets/generate_proof.rs"
+test = false
+doc = false
+bench = false
