@@ -18,8 +18,22 @@ rand = "0.8"
 path = ".."
 
 [[bin]]
-name = "generate_proof"
-path = "fuzz_targets/generate_proof.rs"
+name = "no_budget_rated_voting"
+path = "fuzz_targets/no_budget_rated_voting.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "max_budget_rated_voting"
+path = "fuzz_targets/max_budget_rated_voting.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "ranked_voting"
+path = "fuzz_targets/ranked_voting.rs"
 test = false
 doc = false
 bench = false

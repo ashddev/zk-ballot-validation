@@ -51,8 +51,8 @@ pub fn setup(ballot_size: usize, a_vec: Vec<u32>) -> SetupParameters {
 pub fn generate_proof(
     ballot: &Vec<u32>,
     setup_params: &SetupParameters,
-) -> RankedVotingProof {
-    let permutation: Vec<u32> = find_permutation(&setup_params.a_vec, &ballot);
+) -> Result<RankedVotingProof, String> {
+    let permutation= find_permutation(&setup_params.a_vec, &ballot)?;
     
     let mut rng: StdRng = StdRng::seed_from_u64(0u64);
 
@@ -84,11 +84,11 @@ pub fn generate_proof(
         &mut rng,
     );
 
-    RankedVotingProof {
+    Ok(RankedVotingProof {
         proof,
         committed_ballot,
         committed_permutation,
-    }
+    })
 }
 
 pub fn verify_proof(proof: &RankedVotingProof, setup_params: &SetupParameters) -> bool {
@@ -124,26 +124,31 @@ fn sum_affine_points(affine_points: &[G1Affine]) -> G1Affine {
         .into_affine()
 }
 
-fn find_permutation(vec_a: &[u32], vec_a_permuted: &[u32]) -> Vec<u32> {
-    assert_eq!(
-        vec_a.len(),
-        vec_a_permuted.len(),
-        "Input vectors must be the same length"
-    );
 
-    let mut index_map: HashMap<u32, usize> = HashMap::new();
-    for (i, &value) in vec_a.iter().enumerate() {
-        index_map.insert(value, i);
+fn find_permutation(vec_a: &[u32], vec_b: &[u32]) -> Result<Vec<u32>, String> {
+    if vec_a.len() != vec_b.len() {
+        return Err("Vectors must be the same length".to_string());
     }
 
-    let mut permutation = vec![0u32; vec_a.len()];
+    let index_map: HashMap<u32, usize> = vec_a
+        .iter()
+        .enumerate()
+        .map(|(i, &x)| (x, i))
+        .collect();
 
-    for (i, &value) in vec_a_permuted.iter().enumerate() {
-        let original_index = index_map
-            .get(&value)
-            .expect("Element in permuted vector not found in original vector");
-        permutation[*original_index] = i as u32;
+    let p: Vec<usize> = vec_b
+        .iter()
+        .map(|&x| {
+            index_map
+                .get(&x)
+                .copied()
+                .ok_or_else(|| format!("Element {} not found in original vector", x))
+        })
+        .collect::<Result<Vec<usize>, String>>()?;
+    
+    let mut inv = vec![0; p.len()];
+    for (i, &pi) in p.iter().enumerate() {
+        inv[pi] = i as u32;
     }
-
-    permutation
+    Ok(inv)
 }

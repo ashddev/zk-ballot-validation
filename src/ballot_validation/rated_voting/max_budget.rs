@@ -22,6 +22,7 @@ impl MaxCredit {
 pub struct SetupParameters {
     pc_gens: PedersenGens,
     bp_gens: BulletproofGens,
+    ballot_size: usize,
     max_credit: MaxCredit,
 }
 
@@ -41,6 +42,7 @@ pub fn setup(max_credits: u64, ballot_size: usize, pc_gens: Option<PedersenGens>
     SetupParameters {
         pc_gens,
         bp_gens,
+        ballot_size,
         max_credit
     }
 }
@@ -48,7 +50,15 @@ pub fn setup(max_credits: u64, ballot_size: usize, pc_gens: Option<PedersenGens>
 pub fn generate_proof(
     setup_params: &SetupParameters,
     ballot: Vec<u64>,
-) -> MaxBudgetRatedVotingProof {
+) -> Result<MaxBudgetRatedVotingProof, String> {
+    if ballot.len() != setup_params.ballot_size {
+        return Err(format!(
+            "Ballot length {} does not match expected number of candidates {}",
+            ballot.len(),
+            setup_params.ballot_size
+        ));
+    }  
+
     let ballot_blindings: Vec<Scalar> = (0..ballot.len())
         .map(|_| Scalar::random(&mut thread_rng()))
         .collect();
@@ -61,13 +71,20 @@ pub fn generate_proof(
         &ballot_blindings,
         8,
     )
-    .expect("Failed to create aggregated rangeproof");
+    .map_err(|e| format!("Failed to create aggregated rangeproof: {:?}", e))?;
 
-    let z: u64 = ballot.iter().sum();
+    let z: u64 = ballot
+    .iter()
+    .try_fold(0u64, |acc, &val| acc.checked_add(val))
+    .ok_or_else(|| "Overflow while summing ballot values".to_string())?;
     let z_blinding: Scalar = ballot_blindings.iter().copied().reduce(|a, b| a + b).unwrap();
     let com_z: RistrettoPoint = setup_params.pc_gens.commit(Scalar::from(z), z_blinding);
 
-    let d: u64 = setup_params.max_credit.value - z;
+    let d = setup_params
+    .max_credit
+    .value
+    .checked_sub(z)
+    .ok_or_else(|| format!("Ballot sum {} exceeds max credit {}", z, setup_params.max_credit.value))?;
     let d_blinding: Scalar = -z_blinding;
     
     let rangeproof_d: (RangeProof, CompressedRistretto) = RangeProof::prove_single(
@@ -78,13 +95,13 @@ pub fn generate_proof(
         &d_blinding,
         8,
     )
-    .expect("Failed to create rangeproof");
+    .map_err(|e| format!("Failed to create rangeproof: {:?}", e))?;
 
-    MaxBudgetRatedVotingProof {
+    Ok(MaxBudgetRatedVotingProof {
         votes_proof: rangeproof_votes, 
         com_z: com_z, 
         rangeproof_d: rangeproof_d
-    }
+    })
 }
 
 pub fn verify_proof(

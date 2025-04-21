@@ -8,7 +8,7 @@ use arbitrary::Arbitrary;
 struct MaxBudgetInput {
     ballot: [u64; 16],
 }
-fuzz_target!(|input: NoBudgetInput| {
+fuzz_target!(|input: MaxBudgetInput| {
     let ballot = input.ballot.to_vec();
 
     let setup_params = setup(100, ballot.len(), None);
