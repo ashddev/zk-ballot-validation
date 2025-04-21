@@ -30,7 +30,7 @@ fn benchmark_proof_verification(c: &mut Criterion) {
             },
         );
 
-        let bp_params_max_budget = max_budget::setup(max_credits, ballot_size, Some(pc_gens));
+        let bp_params_max_budget = max_budget::setup(max_credits, ballot_size, Some(pc_gens)).expect("Failed to set up max-budget voting parameters");
         let mut ballot_max_budget = vec![0; ballot_size];
         ballot_max_budget[0] = 1;
         let validity_proof = max_budget::generate_proof(&bp_params_max_budget, ballot_max_budget.clone()).expect("Failed to generate max-budget voting proof");
