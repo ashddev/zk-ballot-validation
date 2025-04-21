@@ -157,7 +157,7 @@ mod tests {
     #[test]
     fn test_valid_proof() {
         let setup_params = basic_setup(4, 20);
-        let ballot = vec![5, 3, 6, 6]; // sums to 20
+        let ballot = vec![5, 3, 6, 6];
 
         let proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
         assert!(verify_proof(&setup_params, proof), "Valid proof should verify");
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn test_overspending_fails() {
         let setup_params = basic_setup(3, 15);
-        let ballot = vec![10, 5, 3]; // sum = 18 > max
+        let ballot = vec![10, 5, 3];
 
         let result = generate_proof(&setup_params, ballot);
         assert!(result.is_err(), "Should fail to generate proof for overspending ballot");
@@ -179,7 +179,6 @@ mod tests {
 
         let mut proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
 
-        // Tamper with one vote commitment
         proof.votes_proof.1[0] = setup_params.pc_gens.commit(Scalar::from(999u64), Scalar::zero()).compress();
 
         assert!(!verify_proof(&setup_params, proof), "Tampered commitment should not verify");
@@ -188,7 +187,7 @@ mod tests {
     #[test]
     fn test_mismatched_ballot_length() {
         let setup_params = basic_setup(4, 10);
-        let ballot = vec![3, 4]; // fewer than ballot_size
+        let ballot = vec![3, 4];
 
         let result = generate_proof(&setup_params, ballot);
         assert!(result.is_err(), "Should fail when ballot length doesn't match setup");

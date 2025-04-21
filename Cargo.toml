@@ -7,10 +7,6 @@ edition = "2021"
 name = "zk_ballot_validation"
 path = "src/lib.rs"
 
-[[bin]]
-name = "zk_ballot_validation_main"
-path = "src/main.rs"
-
 [dependencies]
 rand = "0.8"
 curve25519-dalek-ng = { version = "4.1", default-features = false, features = ["u64_backend"] }
