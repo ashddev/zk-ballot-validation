@@ -12,7 +12,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
     let max_credits = 1;
 
     for &ballot_size in &[4, 8, 16, 32, 64, 128, 256] {
-        let bp_params_no_budget = no_budget::setup(range, ballot_size, Some(pc_gens))?;
+        let bp_params_no_budget = no_budget::setup(range, ballot_size, Some(pc_gens)).expect("Failed to set up no-budget voting parameters");
         let ballot_no_budget: Vec<i64> = (0..ballot_size).map(|x| (x as i64 % 20) - 10).collect();
 
         group.bench_with_input(
@@ -24,7 +24,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
                         black_box(ballot_no_budget.clone()),
                         &bp_params_no_budget
                     );
-                    black_box(proof);
+                    let _ = black_box(proof);
                 });
             },
         );
@@ -42,7 +42,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
                         &bp_params_max_budget,
                         black_box(ballot_max_budget.clone()),
                     );
-                    black_box(proof);
+                    let _ = black_box(proof);
                 });
             },
         );
@@ -60,7 +60,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
                         black_box(&vec_a_permuted),
                         &setup_params,
                     );
-                    black_box(proof);
+                    let _ = black_box(proof);
                 });
             },
         );
