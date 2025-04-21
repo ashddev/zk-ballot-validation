@@ -34,17 +34,21 @@ pub struct MaxBudgetRatedVotingProof {
 }
 
 
-pub fn setup(max_credits: u64, ballot_size: usize, pc_gens: Option<PedersenGens>) -> SetupParameters {
+pub fn setup(max_credits: u64, ballot_size: usize, pc_gens: Option<PedersenGens>) -> Result<SetupParameters, String> {
+    if !ballot_size.is_power_of_two() {
+        return Err("ballot_size must be a power of two".into());
+    }
+
     let pc_gens: PedersenGens = pc_gens.unwrap_or_else(PedersenGens::default);
     let bp_gens: BulletproofGens = BulletproofGens::new(8, ballot_size);
     let max_credit: MaxCredit = MaxCredit::new(&pc_gens, max_credits);
 
-    SetupParameters {
+    Ok(SetupParameters {
         pc_gens,
         bp_gens,
         ballot_size,
         max_credit
-    }
+    })
 }
 
 pub fn generate_proof(
@@ -151,7 +155,7 @@ mod tests {
     use super::*;
 
     fn basic_setup(ballot_size: usize, max_credit: u64) -> SetupParameters {
-        setup(max_credit, ballot_size, None)
+        setup(max_credit, ballot_size, None).unwrap()
     }
 
     #[test]
