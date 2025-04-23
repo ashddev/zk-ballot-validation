@@ -30,15 +30,12 @@ fn benchmark_setup(c: &mut Criterion) {
             },
         );
 
-        let vec_a: Vec<u32> = (0..ballot_size).map(|x| x as u32).collect();
-
         group.bench_with_input(
             BenchmarkId::new("Ranked Voting", ballot_size),
             &ballot_size,
             |b, &_size| {
                 b.iter(|| {
-                    let input_vec = vec_a.clone();
-                    let setup_params = ranked_voting::setup(ballot_size, input_vec);
+                    let setup_params = ranked_voting::setup(ballot_size);
                     let _ = black_box(setup_params);
                 });
             },

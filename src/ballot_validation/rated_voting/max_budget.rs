@@ -169,8 +169,8 @@ mod tests {
 
     #[test]
     fn test_overspending_fails() {
-        let setup_params = basic_setup(3, 15);
-        let ballot = vec![10, 5, 3];
+        let setup_params = basic_setup(4, 15);
+        let ballot = vec![10, 5, 3, 0];
 
         let result = generate_proof(&setup_params, ballot);
         assert!(result.is_err(), "Should fail to generate proof for overspending ballot");
