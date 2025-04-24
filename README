@@ -1,0 +1,42 @@
+# zk-ballot-validation
+
+This repository contains implementations of ballot validation protocols using specialized zero-knowledge proof systems—specifically **Bulletproofs** and **Curdleproofs**. The code is written in **Rust** and structured around a reusable ballot validation framework with support for multiple voting schemes.
+
+## Supported Protocols
+
+The following voting protocols are implemented using the ballot validation framework:
+
+- **No-budget rated voting** — Ensures that each individual rating is valid, with no overall constraint.
+- **Max-budget rated voting** — Enforces a maximum total score budget across the ballot.
+- **Ranked voting** — Validates Borda-style rankings using Same Permutation proofs via Curdleproofs.
+
+Each protocol uses Pedersen vector commitments as a base and provides setup, proof generation, and verification logic.
+
+
+## Running Tests
+
+To run all unit and integration tests:
+
+```bash
+cargo test
+```
+
+## Running Benchmarks
+
+To benchmark proof generation and verification performance, use Criterion.rs:
+
+```bash
+cargo bench
+```
+
+## Getting Started
+
+Clone the repository and build the project:
+
+```bash
+git clone https://github.com/yourusername/zk-ballot-validation.git
+cd zk-ballot-validation
+cargo build --release
+```
+
+To try a specific protocol or test configuration, see the individual modules in src/.
