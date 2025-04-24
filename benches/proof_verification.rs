@@ -5,7 +5,7 @@ use zk_ballot_validation::ballot_validation::rated_voting::max_budget;
 use zk_ballot_validation::ballot_validation::ranked_voting;
 
 fn benchmark_proof_verification(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Proof Verification");
+    let mut group = c.benchmark_group("Verify");
 
     let pc_gens = PedersenGens::default();
     let range = (-10, 10);
@@ -51,7 +51,7 @@ fn benchmark_proof_verification(c: &mut Criterion) {
 
         let vec_a: Vec<u32> = (0..ballot_size).map(|x| x as u32).collect();
         let vec_a_permuted: Vec<u32> = vec_a.iter().cloned().rev().collect();
-        let setup_params = ranked_voting::setup(ballot_size, vec_a);
+        let setup_params = ranked_voting::setup(ballot_size);
         let proof = ranked_voting::generate_proof(&vec_a_permuted, &setup_params).expect("Failed to generate ranked voting proof");
 
         group.bench_with_input(

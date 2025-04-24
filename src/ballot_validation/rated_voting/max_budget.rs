@@ -26,7 +26,7 @@ pub struct SetupParameters {
     max_credit: MaxCredit,
 }
 
-#[derive(Clone)]
+#[derive(Clone)] 
 pub struct MaxBudgetRatedVotingProof {
     votes_proof: (RangeProof, Vec<CompressedRistretto>), 
     com_z: RistrettoPoint, 

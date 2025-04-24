@@ -10,7 +10,7 @@ pub struct SetupParameters {
     shifted_upperbound: RistrettoPoint
 }
 
-#[derive(Clone)]
+#[derive(Clone)] 
 pub struct NoBudgetRatedVotingProof {
     shifted_ballot_committments: Vec<CompressedRistretto>,
     aggregated_rangeproof: (RangeProof, Vec<CompressedRistretto>)

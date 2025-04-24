@@ -24,6 +24,7 @@ pub struct Options {
     scores_as_field_elements: Vec<Fr>
 }
 
+#[derive(Clone)] 
 pub struct RankedVotingProof {
     proof: SamePermutationProof,
     committed_ballot: G1Projective,
