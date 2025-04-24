@@ -14,7 +14,7 @@ fn benchmark_proof_verification(c: &mut Criterion) {
     for &ballot_size in &[4, 8, 16, 32, 64, 128, 256] {
         let bp_params_no_budget = no_budget::setup(range, ballot_size, Some(pc_gens)).expect("Failed to set up no-budget voting parameters");
         let ballot_no_budget: Vec<i64> = (0..ballot_size).map(|x| (x as i64 % 20) - 10).collect();
-        let validity_proof = no_budget::generate_proof(ballot_no_budget.clone(), &bp_params_no_budget).expect("Failed to generate no-budget voting proof");
+        let validity_proof = no_budget::generate_vote(ballot_no_budget.clone(), &bp_params_no_budget).expect("Failed to generate no-budget voting proof");
 
         group.bench_with_input(
             BenchmarkId::new("No Budget Rated Voting", ballot_size),
@@ -33,7 +33,7 @@ fn benchmark_proof_verification(c: &mut Criterion) {
         let bp_params_max_budget = max_budget::setup(max_credits, ballot_size, Some(pc_gens)).expect("Failed to set up max-budget voting parameters");
         let mut ballot_max_budget = vec![0; ballot_size];
         ballot_max_budget[0] = 1;
-        let validity_proof = max_budget::generate_proof(&bp_params_max_budget, ballot_max_budget.clone()).expect("Failed to generate max-budget voting proof");
+        let validity_proof = max_budget::generate_vote(&bp_params_max_budget, ballot_max_budget.clone()).expect("Failed to generate max-budget voting proof");
 
         group.bench_with_input(
             BenchmarkId::new("Max Budget Rated Voting", ballot_size),
@@ -52,7 +52,7 @@ fn benchmark_proof_verification(c: &mut Criterion) {
         let vec_a: Vec<u32> = (0..ballot_size).map(|x| x as u32).collect();
         let vec_a_permuted: Vec<u32> = vec_a.iter().cloned().rev().collect();
         let setup_params = ranked_voting::setup(ballot_size);
-        let proof = ranked_voting::generate_proof(&vec_a_permuted, &setup_params).expect("Failed to generate ranked voting proof");
+        let proof = ranked_voting::generate_vote(&vec_a_permuted, &setup_params).expect("Failed to generate ranked voting proof");
 
         group.bench_with_input(
             BenchmarkId::new("Ranked Voting", ballot_size),

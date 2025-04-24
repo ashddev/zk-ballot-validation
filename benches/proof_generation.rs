@@ -20,7 +20,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
             &ballot_size,
             |b, &_size| {
                 b.iter(|| {
-                    let proof = no_budget::generate_proof(
+                    let proof = no_budget::generate_vote(
                         black_box(ballot_no_budget.clone()),
                         &bp_params_no_budget
                     );
@@ -38,7 +38,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
             &ballot_size,
             |b, &_size| {
                 b.iter(|| {
-                    let proof = max_budget::generate_proof(
+                    let proof = max_budget::generate_vote(
                         &bp_params_max_budget,
                         black_box(ballot_max_budget.clone()),
                     );
@@ -56,7 +56,7 @@ fn benchmark_proof_generation(c: &mut Criterion) {
             &ballot_size,
             |b, &_size| {
                 b.iter(|| {
-                    let proof = ranked_voting::generate_proof(
+                    let proof = ranked_voting::generate_vote(
                         black_box(&vec_a_permuted),
                         &setup_params,
                     );

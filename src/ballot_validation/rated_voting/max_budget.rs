@@ -51,7 +51,7 @@ pub fn setup(max_credits: u64, ballot_size: usize, pc_gens: Option<PedersenGens>
     })
 }
 
-pub fn generate_proof(
+pub fn generate_vote(
     setup_params: &SetupParameters,
     ballot: Vec<u64>,
 ) -> Result<MaxBudgetRatedVotingProof, String> {
@@ -163,7 +163,7 @@ mod tests {
         let setup_params = basic_setup(4, 20);
         let ballot = vec![5, 3, 6, 6];
 
-        let proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
+        let proof = generate_vote(&setup_params, ballot).expect("Should generate proof");
         assert!(verify_proof(&setup_params, proof), "Valid proof should verify");
     }
 
@@ -172,7 +172,7 @@ mod tests {
         let setup_params = basic_setup(4, 15);
         let ballot = vec![10, 5, 3, 0];
 
-        let result = generate_proof(&setup_params, ballot);
+        let result = generate_vote(&setup_params, ballot);
         assert!(result.is_err(), "Should fail to generate proof for overspending ballot");
     }
 
@@ -181,7 +181,7 @@ mod tests {
         let setup_params = basic_setup(2, 10);
         let ballot = vec![5, 5];
 
-        let mut proof = generate_proof(&setup_params, ballot).expect("Should generate proof");
+        let mut proof = generate_vote(&setup_params, ballot).expect("Should generate proof");
 
         proof.votes_proof.1[0] = setup_params.pc_gens.commit(Scalar::from(999u64), Scalar::zero()).compress();
 
@@ -193,7 +193,7 @@ mod tests {
         let setup_params = basic_setup(4, 10);
         let ballot = vec![3, 4];
 
-        let result = generate_proof(&setup_params, ballot);
+        let result = generate_vote(&setup_params, ballot);
         assert!(result.is_err(), "Should fail when ballot length doesn't match setup");
     }
 
@@ -202,7 +202,7 @@ mod tests {
         let setup_params = basic_setup(2, 8);
         let ballot = vec![4, 4];
 
-        let proof = generate_proof(&setup_params, ballot).unwrap();
+        let proof = generate_vote(&setup_params, ballot).unwrap();
         let expected_sum_commitment = proof.votes_proof.1.iter()
             .map(|c| c.decompress().unwrap())
             .fold(RistrettoPoint::default(), |acc, c| acc + c);

@@ -1,6 +1,6 @@
 #![no_main]
 
-use zk_ballot_validation::ballot_validation::rated_voting::no_budget::{setup, generate_proof};
+use zk_ballot_validation::ballot_validation::rated_voting::no_budget::{setup, generate_vote};
 use libfuzzer_sys::fuzz_target;
 use arbitrary::Arbitrary;
 
@@ -20,5 +20,5 @@ fuzz_target!(|input: NoBudgetInput| {
         }
     };
 
-    let _ = generate_proof(ballot, &bp_params);
+    let _ = generate_vote(ballot, &bp_params);
 });

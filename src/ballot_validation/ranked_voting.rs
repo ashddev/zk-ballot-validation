@@ -64,7 +64,7 @@ pub fn setup(ballot_size: usize) -> SetupParameters {
     }
 }
 
-pub fn generate_proof(
+pub fn generate_vote(
     scores: &Vec<u32>,
     setup_params: &SetupParameters,
 ) -> Result<RankedVotingProof, String> {
@@ -173,7 +173,7 @@ mod tests {
         let ballot = vec![1, 0, 2, 3];
         let setup_params = setup(ballot.len());
 
-        let proof = generate_proof(&ballot, &setup_params).expect("Should generate proof");
+        let proof = generate_vote(&ballot, &setup_params).expect("Should generate proof");
         assert!(verify_proof(&proof, &setup_params), "Proof should verify for valid permutation");
     }
 
@@ -182,7 +182,7 @@ mod tests {
         let ballot = vec![1, 0, 2, 2];
         let setup_params = setup(ballot.len());
 
-        let result = generate_proof(&ballot, &setup_params);
+        let result = generate_vote(&ballot, &setup_params);
         assert!(result.is_err(), "Should fail to generate proof for invalid permutation");
     }
 
@@ -191,7 +191,7 @@ mod tests {
         let ballot = vec![2, 3];
         let setup_params = setup(3);
 
-        let result = generate_proof(&ballot, &setup_params);
+        let result = generate_vote(&ballot, &setup_params);
         assert!(result.is_err(), "Should fail due to mismatched lengths");
     }
 
@@ -200,7 +200,7 @@ mod tests {
         let ballot = vec![0, 1, 2, 3];
         let setup_params = setup(ballot.len());
 
-        let mut proof = generate_proof(&ballot, &setup_params).expect("Proof should be valid");
+        let mut proof = generate_vote(&ballot, &setup_params).expect("Proof should be valid");
 
         proof.committed_permutation = G1Projective::rand(&mut StdRng::seed_from_u64(999));
 

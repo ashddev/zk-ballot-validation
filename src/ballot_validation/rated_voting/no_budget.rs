@@ -40,7 +40,7 @@ pub fn setup(range: (i64, i64), ballot_size: usize, pc_gens: Option<PedersenGens
     })
 }
 
-pub fn generate_proof(
+pub fn generate_vote(
     ballot: Vec<i64>,
     setup_params: &SetupParameters
 ) -> Result<NoBudgetRatedVotingProof, String> {
@@ -128,7 +128,7 @@ mod tests {
         let setup_params = basic_setup(4);
         let ballot = vec![0, -5, 7, 10];
 
-        let proof = generate_proof(ballot, &setup_params).expect("Proof generation failed");
+        let proof = generate_vote(ballot, &setup_params).expect("Proof generation failed");
         assert!(verify_proof(&setup_params, proof), "Proof verification failed for valid input");
     }
 
@@ -136,7 +136,7 @@ mod tests {
     fn test_invalid_proof_verification_wrong_commitments() {
         let setup_params = basic_setup(2);
         let ballot = vec![3, -2];
-        let mut proof = generate_proof(ballot, &setup_params).expect("Proof generation failed");
+        let mut proof = generate_vote(ballot, &setup_params).expect("Proof generation failed");
 
         // Tamper with one of the commitments
         proof.shifted_ballot_committments[0] = setup_params.pc_gens.commit(Scalar::from(999u64), Scalar::random(&mut thread_rng())).compress();
@@ -149,7 +149,7 @@ mod tests {
         let setup_params = basic_setup(2);
         let ballot = vec![15, -12]; // Out of range since range is -10 to 10
 
-        let result = generate_proof(ballot, &setup_params);
+        let result = generate_vote(ballot, &setup_params);
         assert!(result.is_err(), "Should not generate proof for out-of-range vote");
     }
 
